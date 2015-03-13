@@ -330,6 +330,7 @@ class Node(object):
     def __init__(self):
         self._negated = False
         self._alias = None
+        self._bind_to = None
         self._ordering = None  # ASC or DESC.
 
     def clone_base(self):
@@ -340,6 +341,7 @@ class Node(object):
         inst._negated = self._negated
         inst._alias = self._alias
         inst._ordering = self._ordering
+        inst._bind_to = self._bind_to
         return inst
 
     @returns_clone
@@ -349,6 +351,15 @@ class Node(object):
     @returns_clone
     def alias(self, a=None):
         self._alias = a
+
+    @returns_clone
+    def bind_to(self, bt):
+        """
+        Bind the results of an expression to a specific model type. Useful when adding
+        expressions to a select, where the result of the expression should be placed on
+        a joined instance.
+        """
+        self._bind_to = bt
 
     @returns_clone
     def asc(self):
@@ -1885,7 +1896,10 @@ class ModelQueryResultWrapper(QueryResultWrapper):
                 attr = node.name
                 conv = node.python_value
             else:
-                key = constructor = self.model
+                if node._bind_to is None:
+                    key = constructor = self.model
+                else:
+                    key = constructor = node._bind_to
                 if isinstance(node, Expression) and node._alias:
                     attr = node._alias
             column_map.append((key, constructor, attr, conv))

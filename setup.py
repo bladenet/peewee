@@ -1,5 +1,4 @@
 import os
-from setuptools import find_packages
 from setuptools import setup
 
 f = open(os.path.join(os.path.dirname(__file__), 'README.rst'))
@@ -8,7 +7,7 @@ f.close()
 
 setup(
     name='peewee',
-    version=__import__('peewee').__version__,
+    version='2.4.7-blade',
     description='a little orm',
     long_description=readme,
     author='Charles Leifer',
